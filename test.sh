@@ -1,5 +1,3 @@
-#!/bin/bash
-myname="xxy"
-readonly myname
-myname="machine"
-
+#!/bin/zsh
+string="runoob is a great company"
+echo `expr index "$string" is`

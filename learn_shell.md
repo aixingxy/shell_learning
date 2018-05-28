@@ -208,3 +208,54 @@ fi
 - `-le`: 判断左边的数是否小于等于右边的数
 
 在if语句中，判断条件[ $a -ne $b ]的空格是严格的
+
+#### 布尔运算符
+- `!`: 非运算符，表达式为ture则返回false，否则返回true
+- `-o`: 或运算符，有一个表达式为true，则返回ture
+- `-a`: 与运算符，有两个表达式都为ture才返回true
+
+
+#### 逻辑运算符
+- `&&`: 逻辑的AND
+- `||`: 逻辑的OR
+
+#### 字符串运算符
+- `=`: 检测两个字符串是否相等，相等返回true
+- `!=`: 检测两个字符串是否不相等，不相等返回true
+- `-z`: 检测字符串长度是否为0，为0返回true [ -z $a ] 返回 false
+- `n`: 检测字符串长度是否为0，不为0返回true [ -n $a ] 返回 true
+- `str`: 检测字符串是否为空，不为空返回ture [ $a ] 返回 true
+
+
+#### 输出重定向
+重定向一般是通过在命令之间插入特定的符号来实现
+``` bash
+ command1 > file1
+```
+先执行command1，然后将输出的内容存入到file1，file1中的内容将被新的内容替换。如果要将新的内容追加到文件末尾，使用>>操作符。
+
+#### 输入重定向
+将本来需要从键盘获取输入的命令会转移到从文件获取输入
+统计users文件的行数
+wc -l < users
+
+##### 重定向深入讲解
+一般情况下，每个Unix/Linux命令运行时会打开三个文件：
+ 标准输入文件（stdin）：stdin的文件描述符为0
+ 标准输出文件（stdout）：stdout的文件描述符为1
+ 标准错误文件（stderr）：stderr的文件描述符为2
+默认情况下，`command > file` 将stdout重定向到file，`command < file`将stdin重定向到file
+
+将stderr重定向到file，可以用`command 2 > file`
+将stdout和stderr合并后重定向到file，`command > file 2>&1` 或者 `command >> file 2>&1`
+
+##### /dev/null文件
+如果希望执行某个命令，但又不希望在屏幕上显示输出结果，那么可以将输出重定向到/dev/null:
+``` bash
+command > /dev/null
+```
+/dev/null是一个特殊的文件，写入到它的内容都会被丢弃；如果尝试从该文件读取内容，那什么也读取不到。但是/dev/null文件非常有用，将命令的输出重定向到它，会起到“禁止输出”的效果。
+如果希望屏蔽stdout和stderr，可以这样写
+``` bash
+command > /dev/null 2>&1
+```
