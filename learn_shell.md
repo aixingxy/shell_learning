@@ -1,3 +1,58 @@
+# 变量的显示：echo
+```
+xxy@xxy:~$ echo $PATH
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+xxy@xxy:~$ echo ${PATH}
+/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games:/snap/bin
+```
+# 变量的设置规则
+1. 变量与变量内容以一个等号“=”来连接。
+2. 等号两边不能直接接空格符号。
+3. 变量名称只能是英文字母与数字，但是开头字符不能是数字。
+4. 变量内容若有空格符可使用双引号“"”或单引号“'”将变量的内容结合起来，但是
++ 双引号内的特殊字符如$等，可以保佑原本的特性，例如：
+```
+xxy@xxy:~$ var="lang is $LANG"
+xxy@xxy:~$ echo $var
+lang is zh_CN.UTF-8
+```
++ 单引号内的特殊字符则仅为一般字符（纯文本），例如“
+```
+xxy@xxy:~$ var="lang is $LANG"
+xxy@xxy:~$ echo $var
+lang is zh_CN.UTF-8
+```
+5. 可用转义字符”\“将特殊符号变成一般字符
+6. 在一串命令中，还需要通过其他命令提供的信息，可以使用反单引号”`命令`“或”$(命令)“，例如：
+```
+xxy@xxy:~$ version=$(uname -r)
+xxy@xxy:~$ echo $version
+4.4.0-130-generic
+xxy@xxy:~$ version=`uname -r`
+xxy@xxy:~$ echo $version
+4.4.0-130-generic
+```
+7. 若该变量为了增加变量内容时，则可用"$变量名称"或${变量}累加到内容，例如：
+```
+PATH="$PATH:/home/bin"
+```
+8. 若该变量需要在其他子进程执行，则需要以export来使用变量变成环境变量
+```
+export PATH
+```
+9. 通常大写字符位系统默认变量，自行设置变量可以使用小写变量，方便判断。
+10. 取消变量的方法为使用“unset变量名称”，例如取消version的设置
+```
+xxy@xxy:~$ version=$(uname -r)
+xxy@xxy:~$ echo $version
+4.4.0-130-generic
+xxy@xxy:~$ version=`uname -r`
+xxy@xxy:~$ echo $version
+4.4.0-130-generic
+xxy@xxy:~$ unset version
+xxy@xxy:~$ echo $version
+
+```
 # shell 学习
 ## 编写第一个shell脚本
 ``` tex
