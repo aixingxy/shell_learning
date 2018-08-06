@@ -16,7 +16,7 @@ xxy@xxy:~$ var="lang is $LANG"
 xxy@xxy:~$ echo $var
 lang is zh_CN.UTF-8
 ```
-+ 单引号内的特殊字符则仅为一般字符（纯文本），例如“
++ 单引号内的特殊字符则仅为一般字符（纯文本），例如:
 ```
 xxy@xxy:~$ var="lang is $LANG"
 xxy@xxy:~$ echo $var
