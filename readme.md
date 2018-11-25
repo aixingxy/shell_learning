@@ -314,3 +314,279 @@ command > /dev/null
 ``` bash
 command > /dev/null 2>&1
 ```
+# 变量赋值格式
+变量赋值等号两边不能有空格
+
+$name 是${name}的简化版,在某些情况下必须使用花括号的方式来消除歧义并避免意外结果
+```shell
+xxy@xxy:~$ VAR="1234"
+xxy@xxy:~$ echo $VAR
+1234
+xxy@xxy:~$ echo $VAR1234  # 将会查找VAR1234这个变量
+
+xxy@xxy:~$ echo ${VAR}1234
+12341234
+```
+# data命令
+date命令是显示或设置系统时间与日期
+-s<字符串>：根据字符串来设置日期与时间。字符串前后必须加上双引号
+<+时间日期格式>：指定显示时候，使用指定的日期时间格式
+```shell
+xxy@xxy:~$ date +"%Y-%m-%d %H:%M:%S"
+2018-11-25 22:28:48
+```
+
+# 数学运算expr命令
+1. 用空格隔开每个项
+2. 用/(反斜杠)放在shell特定的字符前面
+3. 对包含空格和其他特殊的字符串要用引号括起来
+
+```shell
+# 计算字符串长度
+xxy@xxy:~$ expr length "this is a test"
+14
+# 抓取子串
+xxy@xxy:~$ expr substr "this is a test" 3 5
+is is
+# 抓取第一个字符数字串出现的位置
+xxy@xxy:~$ expr index "sarsarsar" a
+2
+# 整数运算
+xxy@xxy:~$ expr 14 % 9
+5
+xxy@xxy:~$ expr 10 + 10
+20
+xxy@xxy:~$ expr 10+10  #　注意空格
+10+10
+```
+
+# sed流编辑器
+sed编辑器是一行一行处理文件内容的。正在处理的内容存放在模式空间（缓冲区）内，处理完成以后按照选项的规定进行输出或文件的修改。
+sef是一种在线编辑器，它一次处理一行内容。处理时，把当前处理的行存储在临时缓冲区中，称为“模式空间”（pattern sapce），接着用sed命令处理缓冲区中的内容，处理完成后，把缓冲区的内容送往屏幕。
+接着处理下一行，这样不断重复，知道文件末尾。文件内容并没有改变，除非你使用重定向存储输出。sed主要用来自动编辑一个或多个文件；简化对文件的反复操作。
+sed也支持正则表达式，如果要使用扩展正则表达式加参数-r
+sed的执行过程：
+1.一次读取一行数据
+2.根据提供的规则来匹配相关的数据，比如查找root
+3.按照命令修改数据流中的数据，比如替换
+4.将结果进行输出
+5.重复上面四步
+
+如何使用
+语法格式 sed [options] '[commands]' filename
+
+```shell
+xxy@xxy:~$ echo "this is apple" | sed 's/apple/dog/'
+this is dog
+xxy@xxy:~$ echo "this is apple" | sed 's/apple/dog/'
+this is dog
+xxy@xxy:~$ echo "this is apple" >> a.txt
+xxy@xxy:~$ sed 's/apple/dog/' a.txt
+this is dog
+xxy@xxy:~$ cat a.txt
+this is apple
+```
+
+sed选项|参数
+
+|options|描述|
+|:-:|:-:|
+|-a |在当前行插入文件|
+|-n |读取下一个输出行，用下一个命令处理新的行而不是用第一个命令|
+|-e |执行多个sed指令|
+|-f |运行脚本|
+|-i |编辑文件内容|
+|-i.bak |编辑的同时创建.bak的备份|
+|-r |使用扩展的正则表达式|
+
+|commands|描述|
+|:-:|:-:|
+|i |在当前行上面插入文件|
+|c |把选定的行改为新的额指定的文件|
+|p |打印|
+|d |删除|
+|r/R |读取文件/一行|
+|W |另存|
+|s |查找|
+|y |替换|
+|h |拷贝模板块的内容到内存中的缓冲区|
+|H |追加模板块的内容到缓冲区|
+|g |获得内存缓冲区的内容，并替代当前模板中的文本|
+|G |获得内存缓冲区的内容，并追加到当前模板块文本后面|
+|D |删除\n之前的内容|
+
+|替换标记|描述|
+|:-:|:-:|
+|数字|表明新文本将替换第几处模式匹配的地方
+|g|表示新文本将会替换所有匹配的文本
+|\1|子穿匹配标记，前面搜索可以用元字符集\(//\)
+|&|保留搜索到的字符串用来替换其他字符
+
+|sed匹配字符集|描述|
+|:-:|:-:|
+|^|匹配行开始，如：/^sed/匹配所有以sed开头的行
+|$|匹配行结束，如：/sed$匹配所有以sed结尾的行
+|.|匹配一个非换行符的任意字符，如：/s.d/匹配s后接一个任意字符，最后是d
+|*|匹配0个或多个字符，如：/*sed/匹配所有模板是一个或多个空格后紧跟sed的行
+
+
+
+例1：只替换第一个匹配到的字符，将passwd中root用户替换成xuegod
+```shell
+xxy@xxy:~$ sed 's/root/xuegod/' /etc/passwd
+例2：全面替换标记g
+xxy@xxy:~$ sed 's/root/xuegod/g' /etc/passwd
+例3：将sed中默认的/定界符改成#号
+xxy@xxy:~$ sed 's#/bin/bash#/sbin/nologin#' /etc/passwd
+如果非得用，加转义符号
+xxy@xxy:~$ sed 's/\/bin\/bash/\/sbin\/nologin/' /etc/passwd
+```
+（2）按行查找替换
+写法如下：
+用数字表示范围；$表示行尾
+用文本模式配置来过滤
+例1：单行替换，将第2行中第一个bin替换成xuegod
+```shell
+xxy@xxy:~$ sed '2s/bin/xuegod/' /etc/passwd
+xxy@xxy:~$ sed '2s/bin/xuegod/g' /etc/passwd  # 将第二行中所有bin都替换成xuegod
+xxy@xxy:~$ sed '2,$s/bin/xuegod/g' /etc/passwd  # 将第二行到最后一行的所有bin都替换成xuegod
+```
+（3）d 删除第二行到第4行
+```shell
+xxy@xxy:~$ cat a.txt
+this is apple
+line1
+line2
+line3
+line4
+line5
+xxy@xxy:~$ sed '2,4d' a.txt
+this is apple
+line4
+line5
+```
+
+（4）添加行
+命令i(insert)，在当前行前面插入一行 i\
+命令a(append)，在当前行后面添加一行 a\
+```shell
+xxy@xxy:~$ sed '1i\append' a.txt  # 在第一行前插入
+append
+this is apple
+line1
+line2
+line3
+line4
+line5
+xxy@xxy:~$ sed '1a\append' a.txt  # 在第1行后面追加
+this is apple
+append
+line1
+line2
+line3
+line4
+line5
+xxy@xxy:~$ sed '2,4a\append' a.txt # 2,3,4行后面追加append
+this is apple
+line1
+append
+line2
+append
+line3
+append
+line4
+line5
+xxy@xxy:~$ sed 'a\append' a.txt  # 每一行都追加
+this is apple
+append
+line1
+append
+line2
+append
+line3
+append
+line4
+append
+line5
+append
+xxy@xxy:~$ sed '$a\append' a.txt  # 在最后一行追加
+this is apple
+line1
+line2
+line3
+line4
+line5
+append
+```
+（5）修改行命令c(change) c\
+修改第4行内容
+```shell
+xxy@xxy:~$ sed '1c\line0' a.txt
+line0
+line1
+line2
+line3
+line4
+line5
+xxy@xxy:~$ sed '1,3c\line0' a.txt
+line0
+line3
+line4
+line5
+```
+将line的内容都改成LINE
+```shell
+xxy@xxy:~$ sed '/line0/c\LINE0' a.txt
+this is apple
+line1
+line2
+line3
+line4
+line5
+```
+（6）打印，直接输入文件中的内容
+```shell
+xxy@xxy:~$ sed -n '1p' a.txt
+this is apple
+```
+
+（7）将修改过或过滤出来的内容保存到另一个文件中
+```shell
+xxy@xxy:~$ sed -n '/root/w c.txt' /etc/passwd
+xxy@xxy:~$ cat c.txt
+root:x:0:0:root:/root:/bin/bash
+```
+
+（8）-i对源文件修改
+```shell
+xxy@xxy:~$ sed -i 's/line/LINE/' a.txt
+xxy@xxy:~$ cat a.txt
+this is apple
+LINE1
+LINE2
+LINE3
+LINE4
+LINE5
+```
+（9）查找字符串
+```shell
+xxy@xxy:~$ cat a.txt
+per_cpu:0
+speakid:maohui 9101-0,9102-0
+
+speakid:sangzhujuan 9201-1,9202-1
+xxy@xxy:~$ cat c.sh
+echo "重启端口号：$1"
+confile=a.txt
+port=$1
+gpuid=`grep $port $confile | sed -r "s#(speakid:)(.*) (.*)($port)-([0-9])(.*)#\5#"`
+echo "gpu: $gpuid"
+
+speakid=`grep $port $confile | sed -r "s#(speakid:)(.*) (.*)($port)-([0-9])(.*)#\2#"`
+echo "speakid: $speakid"
+xxy@xxy:~$ sh c.sh 9101
+重启端口号：9101
+gpu: 0
+speakid: maohui
+
+```
