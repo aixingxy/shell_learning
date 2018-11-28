@@ -18,9 +18,9 @@ lang is zh_CN.UTF-8
 ```
 + 单引号内的特殊字符则仅为一般字符（纯文本），例如:
 ```
-xxy@xxy:~$ var="lang is $LANG"
+xxy@xxy:~$ var='lang is $LANG'
 xxy@xxy:~$ echo $var
-lang is zh_CN.UTF-8
+lang is $LANG
 ```
 5. 可用转义字符”\“将特殊符号变成一般字符
 6. 在一串命令中，还需要通过其他命令提供的信息，可以使用反单引号”`命令`“或”$(命令)“，例如：
@@ -590,3 +590,242 @@ gpu: 0
 speakid: maohui
 
 ```
+
+# grep基础参数
+grep在数据中查找一个字符串时，是以证书行为单位来进行行数据选取的
+
+grep [-acinv] [--color=auto] ‘查找字符串’ filename
+|参数|描述|
+|:-:|:-:|
+|-a   |将binary文件以txt文件的方式查找数据   |
+|-c   |计算找到‘查找字符串’的次数   |
+|-i   |忽略大小写的不同，所有大小写视为相同   |
+|-n   |顺便输出行号   |
+|-v   |反向选择，即显示没有‘查找字符串’内容的那一行   |
+|--color=auth   |可以将找到的关键字部分加上颜色显示   |
+
+例：将last当中有出现xxy的那一行取出来
+> `last`显示登陆者信息
+
+```shell
+xxy@xxy:~/xxy_github/shell_learning$ last | grep xxy
+xxy      pts/14       :0               Tue Nov 27 22:30   still logged in   
+xxy      pts/8        :0               Tue Nov 27 22:26   still logged in   
+xxy      :0           :0               Tue Nov 27 22:09   still logged in   
+xxy      pts/8        :0               Sun Nov 25 19:29 - 22:54  (03:25)  
+...
+```
+例：与上例相反
+```shell
+xxy@xxy:~/xxy_github/shell_learning$ last | grep -v xxy
+reboot   system boot  4.4.0-138-generi Tue Nov 27 22:08 - 22:41  (00:32)    
+reboot   system boot  4.4.0-138-generi Sat Nov 17 20:15 - 22:55 (8+02:39)   
+reboot   system boot  4.4.0-138-generi Thu Nov 15 20:53 - 22:53  (01:59)    
+reboot   system boot  4.4.0-138-generi Wed Nov 14 20:16 - 23:21  (03:05)  
+...
+```
+
+例：在`last`的信息输出中，取非xxy，并且仅取第一列
+```shell
+xxy@xxy:~/xxy_github/shell_learning$ last | grep -v 'xxy' | cut -d ' ' -f 1
+reboot
+reboot
+reboot
+reboot
+reboot
+reboot
+reboot
+...
+```
+# grep高级参数
+
+grep [-A] [-B] [--color=auto] '搜索字符串' filename
+|参数|描述|
+|:-:|:-:|
+|-A   |后面可加数字，为after的意思，除了列出该行外，后续的n行也列出来了 |
+|-B   |后面可加数字，为before的意思，除了列出该行外，前面的n行也列出了   |
+|--color=auto   |可将正确的那个选取数据列出颜色   |
+
+```shell
+xxy@xxy:~$ cat a.txt | grep -A2 -B2 -n 1
+1-line 0
+2:line 1
+3-line 2
+4-line 3
+```
+
+# 基础正则表达式练习
+例题一：查找特定字符串
+```shell
+xxy@xxy:~$ grep -n 'the' regular_express.txt
+8:I can't finish the test.
+12:the symbol '*' is represented as start.
+15:You are the best is mean you are the no. 1.
+16:The world <Happy> is the same with "glad".
+18:google is the best tools for search keyword.
+
+```
+反选
+```shell
+xxy@xxy:~$ grep -nv 'the' regular_express.txt
+1:"Open Source" is a good mechanism to develop programs.
+2:apple is my favorite food.
+3:Football game is not use feet only.
+4:this dress doesn't fit me.
+5:However, this dress is about $ 3183 dollars.
+6:GNU is free air not free beer.
+7:Her hair is very beauty.
+9:Oh! The soup taste good.
+10:motorcycle is cheap than car.
+11:This window is clear.
+13:Oh!	My god!
+14:The gd software is a library for drafting programs.
+17:I like dog.
+19:goooooogle yes!
+20:go! go! Let's go.
+21:# I am VBird
+22:
+
+```
+忽略大小写
+```shell
+xxy@xxy:~$ grep -in 'the' regular_express.txt
+8:I can't finish the test.
+9:Oh! The soup taste good.
+12:the symbol '*' is represented as start.
+14:The gd software is a library for drafting programs.
+15:You are the best is mean you are the no. 1.
+16:The world <Happy> is the same with "glad".
+18:google is the best tools for search keyword.
+```
+
+例子二：利用中括号[]来查找集合字符
+
+```shell
+xxy@xxy:~$ grep -n 't[ae]st' regular_express.txt
+8:I can't finish the test.
+9:Oh! The soup taste good.
+
+xxy@xxy:~$ grep -n '[^g]oo' regular_express.txt  # 反选不想找g开头的oo字符串
+2:apple is my favorite food.
+3:Football game is not use feet only.
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+
+xxy@xxy:~$ grep -n [^a-z]oo regular_express.txt  #查找前面不包含小写字母的oo组合
+3:Football game is not use feet only.
+xxy@xxy:~$ grep -n [^[:lower:]]oo regular_express.txt
+3:Football game is not use feet only.
+
+xxy@xxy:~$ grep -n '[0-9]' regular_express.txt  # 查找数字
+5:However, this dress is about $ 3183 dollars.
+15:You are the best is mean you are the no. 1.
+xxy@xxy:~$ grep -n '[[:digit:]]' regular_express.txt
+5:However, this dress is about $ 3183 dollars.
+15:You are the best is mean you are the no. 1.
+```
+
+例题三：行首与行尾
+```shell
+xxy@xxy:~$ grep -n '^the' regular_express.txt  # 查找以the开头的行   
+12:the symbol '*' is represented as start.
+
+xxy@xxy:~$ grep -n '^[a-z]' regular_express.txt  # 查找小写字母开头的句子
+2:apple is my favorite food.
+4:this dress doesn't fit me.
+10:motorcycle is cheap than car.
+12:the symbol '*' is represented as start.
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+20:go! go! Let's go.
+
+xxy@xxy:~$ grep -n '^[[:lower:]]' regular_express.txt
+2:apple is my favorite food.
+4:this dress doesn't fit me.
+10:motorcycle is cheap than car.
+12:the symbol '*' is represented as start.
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+20:go! go! Let's go.
+
+xxy@xxy:~$ grep -n '^[^a-zA-Z]' regular_express.txt  # 查找不以字母开头的句子
+1:"Open Source" is a good mechanism to develop programs.
+21:# I am VBird
+# ^在[]内代表“反向选择”，在[]之外则代表定位在行首的意义
+
+xxy@xxy:~$ grep -n '\.$' regular_express.txt  # 查找以小数点结尾的句子
+1:"Open Source" is a good mechanism to develop programs.
+2:apple is my favorite food.
+3:Football game is not use feet only.
+4:this dress doesn't fit me.
+10:motorcycle is cheap than car.
+11:This window is clear.
+12:the symbol '*' is represented as start.
+15:You are the best is mean you are the no. 1.
+16:The world <Happy> is the same with "glad".
+17:I like dog.
+18:google is the best tools for search keyword.
+20:go! go! Let's go.
+
+xxy@xxy:~$ grep -n '^$' regular_express.txt  # 查找“”
+22:
+```
+
+例子四：任意一个字符.与重复字符*
+
+> 在bash总通配符*可以用来表示任意（0或多个）字符，但是正则表达式并不是通配符，两个不同
+
++ .(小数点)：代表一定有一个任意字符的意思
++ *（星号）：代表重复前一个0到无穷多次的意思，为组合形态
+
+```shell
+xxy@xxy:~$ grep -n 'g..d' regular_express.txt  # 查找g??d的字符串
+1:"Open Source" is a good mechanism to develop programs.
+9:Oh! The soup taste good.
+16:The world <Happy> is the same with "glad".
+
+xxy@xxy:~$ grep -n 'ooo*' regular_express.txt  # 查找只少两个以上的字符串
+1:"Open Source" is a good mechanism to develop programs.
+2:apple is my favorite food.
+3:Football game is not use feet only.
+9:Oh! The soup taste good.
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+
+xxy@xxy:~$ grep -n 'goo*g' regular_express.txt  # 查找g开头，g结尾，中间只少存在一个o
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+
+xxy@xxy:~$ grep -n 'g.*g' regular_express.txt  # .*代表零个或多个任意字符的意思
+1:"Open Source" is a good mechanism to develop programs.
+14:The gd software is a library for drafting programs.
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+20:go! go! Let's go.
+
+```
+
+# 例题五：限定连续RE字符范围{}
+```shell
+xxy@xxy:~$ grep -n 'o\{2\}' regular_express.txt  # 找到两个o的字符串
+1:"Open Source" is a good mechanism to develop programs.
+2:apple is my favorite food.
+3:Football game is not use feet only.
+9:Oh! The soup taste good.
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+
+xxy@xxy:~$ grep -n 'go\{2,5\}g' regular_express.txt  # 查找g开头后面接2到5个o，再接一个g
+18:google is the best tools for search keyword.
+
+xxy@xxy:~$ grep -n 'go\{2,\}g' regular_express.txt  # 查找g开头，接任意多个o，再接一个g
+18:google is the best tools for search keyword.
+19:goooooogle yes!
+```
+
+
+
+
+
+
+例子三：
