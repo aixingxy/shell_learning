@@ -1,0 +1,16 @@
+# 检测脚本\命令运行时间
+```shell
+xxy@xxy:~$ time ls | wc -l
+33
+
+real	0m0.004s
+user	0m0.006s
+sys	0m0.001s
+
+xxy@xxy:~$ time sh del1.sh 
+1
+
+real	0m0.014s
+user	0m0.012s
+sys	0m0.002s
+```
