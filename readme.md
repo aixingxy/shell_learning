@@ -823,9 +823,30 @@ xxy@xxy:~$ grep -n 'go\{2,\}g' regular_express.txt  # 查找g开头，接任意�
 19:goooooogle yes!
 ```
 
+# 工作积累
 
+## watch 命令
+以周期性的方式执行给定的指令，指令输出以全屏方式显示
+```shell
+watch -n 1 nvidia-smi
+```
 
+## Anaconda
+### 下载安装Anaconda
+### 创建tensorflow虚拟环境
+```shell
+conda create --name tf_gpu_env tensorflow-gpu  
+# tf_gpu_env是这个环境的名字
+```
 
+Anaconda 会自动安装tensorflow所需的依赖，`包含正确的CUDA和cudnn`
 
+## 启动虚拟环境
+```shell
+source activate tf_gpu_env
+```
 
-例子三：
+## 退出当前环境
+```shell
+source deactivate
+```
